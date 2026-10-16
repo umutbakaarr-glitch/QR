@@ -2,10 +2,10 @@
  * Yayın bağlantısı: kartvizit dosyalarının GitHub deposuna yazılması.
  * Erişim anahtarı yalnızca şifreli kasada (store.settings) saklanır.
  */
-import { PUBLISH } from '../config.js?v=9';
-import { cardFilePath, encryptCardFile } from '../core/card-file.js?v=9';
-import { GitHubPublisher } from '../core/publisher.js?v=9';
-import { $, closeOverlay, openOverlay, toast } from './dom.js?v=9';
+import { PUBLISH } from '../config.js?v=10';
+import { cardFilePath, encryptCardFile } from '../core/card-file.js?v=10';
+import { GitHubPublisher } from '../core/publisher.js?v=10';
+import { $, closeOverlay, openOverlay, toast } from './dom.js?v=10';
 
 const TOKEN_SETTING = 'github_token';
 

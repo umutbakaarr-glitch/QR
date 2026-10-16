@@ -1,10 +1,10 @@
 /**
  * Kartvizit oluşturma / düzenleme çekmecesi ve canlı önizleme.
  */
-import { CARD_FIELDS, CARD_PAGE_PATH } from '../config.js?v=9';
-import { encodeCard } from '../core/card-codec.js?v=9';
-import { DEFAULT_COLORS } from '../core/validation.js?v=9';
-import { $, closeOverlay, openOverlay } from './dom.js?v=9';
+import { CARD_FIELDS, CARD_PAGE_PATH } from '../config.js?v=10';
+import { encodeCard } from '../core/card-codec.js?v=10';
+import { DEFAULT_COLORS } from '../core/validation.js?v=10';
+import { $, closeOverlay, openOverlay } from './dom.js?v=10';
 
 const PREVIEW_DELAY_MS = 150;
 

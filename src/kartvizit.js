@@ -6,11 +6,11 @@
  *  - Eski QR'lar ve panel önizlemesi (#<veri>): bilgiler doğrudan bağlantıdan çözülür.
  * Sayfa çerez kullanmaz; içerik yalnızca DOM API'leriyle (innerHTML kullanılmadan) oluşturulur.
  */
-import { ORG } from './config.js?v=9';
-import { decodeCard } from './core/card-codec.js?v=9';
-import { decryptCardFile, parseFragment } from './core/card-file.js?v=9';
-import { formatPhone, telHref } from './core/phone.js?v=9';
-import { buildVCard, slugify } from './core/vcard.js?v=9';
+import { ORG } from './config.js?v=10';
+import { decodeCard } from './core/card-codec.js?v=10';
+import { decryptCardFile, parseFragment } from './core/card-file.js?v=10';
+import { formatPhone, telHref } from './core/phone.js?v=10';
+import { buildVCard, slugify } from './core/vcard.js?v=10';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const ICONS = {
@@ -49,14 +49,26 @@ const initials = (name) => {
   return parts.length ? (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toLocaleUpperCase('tr') : '?';
 };
 
+const isIOS = () => /iP(hone|ad|od)/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+/**
+ * Kişiyi telefon rehberine kaydettirir.
+ * iPhone/iPad: vCard'a yönlenmek Safari'de doğrudan "Yeni Kişi" ekranını açar.
+ * Android ve diğerleri: .vcf dosyası indirilir; telefon rehber uygulamasıyla açar.
+ */
 function saveContact(card) {
   const blob = new Blob([buildVCard(card)], { type: 'text/vcard;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const link = el('a', { href: url, download: `${slugify(card.full_name)}.vcf` });
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  if (isIOS()) {
+    window.location.href = url;
+  } else {
+    const link = el('a', { href: url, download: `${slugify(card.full_name)}.vcf` });
+    document.body.append(link);
+    link.click();
+    link.remove();
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 function contactRow(iconName, label, value, href, extra) {
@@ -112,28 +124,31 @@ function renderCard(card, root) {
   );
 }
 
-/** Rehber QR: kişiyi rehbere kaydetmeye odaklı ekran. */
+let autoSaved = false;
+
+/**
+ * Rehber QR: güncel bilgiler gelir gelmez telefonun "Kişiyi kaydet" ekranı kendiliğinden açılır.
+ * Telefon otomatik açmayı engellerse ekranda tek bir "Rehbere kaydet" düğmesi kalır.
+ */
 function renderSaveContact(card, root) {
   const name = card.full_name || 'Adı Soyadı';
   document.title = `${name} · Rehbere kaydet · ${ORG.name}`;
   const save = el('button', { className: 'save-big', type: 'button' }, icon('save'), el('span', { textContent: 'Rehbere kaydet' }));
   save.addEventListener('click', () => saveContact(card));
-  const details = el('button', { className: 'link-btn', type: 'button', textContent: 'Kartviziti görüntüle' });
-  details.addEventListener('click', () => renderCard(card, root));
   root.replaceChildren(
-    el('section', { className: 'profile' },
-      el('div', { className: 'profile-avatar', textContent: initials(name) }),
+    el('section', { className: 'profile compact' },
       el('h1', { textContent: name }),
-      card.title_tr ? el('p', { className: 'title-tr', textContent: card.title_tr }) : null,
-      card.title_en ? el('p', { className: 'title-en', lang: 'en', textContent: card.title_en }) : null,
-      el('p', { className: 'save-hint', textContent: 'İletişim bilgilerini telefon rehberinize eklemek için dokunun.' }),
-      save,
-      details),
+      el('p', { className: 'save-hint', textContent: 'Kişi kaydı açılıyor… Açılmazsa aşağıdaki düğmeye dokunun.' }),
+      save),
     el('footer', { className: 'foot' },
       `© ${ORG.name} · `,
       el('a', { href: ORG.site, target: '_blank', rel: 'noopener noreferrer', textContent: ORG.siteLabel }),
       el('div', { className: 'privacy', textContent: 'Bu sayfa çerez kullanmaz; bilgiler hiçbir sunucuya gönderilmez.' })),
   );
+  if (!autoSaved) {
+    autoSaved = true;
+    setTimeout(() => saveContact(card), 150);
+  }
 }
 
 function renderMessage(root, title = 'Kartvizit bulunamadı', text = 'Bu QR koda ait kartvizit bilgisi okunamadı.') {
