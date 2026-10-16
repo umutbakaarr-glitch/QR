@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; frame-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; frame-src 'self'; connect-src 'self' https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
 <title>Canlar Group QR Kod Sistemi</title>
 <link rel="icon" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/base.css?v=5">
-<link rel="stylesheet" href="assets/css/panel.css?v=5">
-<script src="src/theme-init.js?v=5"></script>
-<script src="assets/vendor/qrcode-generator.js?v=5" defer></script>
-<script type="module" src="src/panel.js?v=5"></script>
+<link rel="stylesheet" href="assets/css/base.css?v=6">
+<link rel="stylesheet" href="assets/css/panel.css?v=6">
+<script src="src/theme-init.js?v=6"></script>
+<script src="assets/vendor/qrcode-generator.js?v=6" defer></script>
+<script type="module" src="src/panel.js?v=6"></script>
 </head>
 <body>
 
@@ -67,7 +67,7 @@
         <input class="input" type="password" id="loginSecret" autocomplete="current-password" required>
       </div>
       <button class="btn primary block" type="submit">Giriş yap</button>
-      <p class="version">Sürüm 2.3</p>
+      <p class="version">Sürüm 3.0</p>
     </form>
   </div>
 </section>
@@ -84,7 +84,9 @@
     <button class="nav" type="button" data-action="new"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg>Yeni kartvizit</button>
     <div class="infobox">
       <div class="infobox-title"><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg>Veri güvenliği</div>
-      <p>Kartvizitler yalnızca bu cihazda, şifreli olarak saklanır. Hiçbir sunucuya gönderilmez.</p>
+      <p>Panel kayıtları bu cihazda şifreli saklanır. Kartvizitler kişiye özel anahtarla şifrelenerek yayınlanır.</p>
+      <div class="publish-line"><span class="dot" id="publishDot"></span><span id="publishStatus">Yayın bağlantısı yok</span></div>
+      <button type="button" class="link" id="publishSetupBtn">Yayın bağlantısı</button>
       <button type="button" class="link" id="exportBtn">Yedek al</button>
       <button type="button" class="link" id="importBtn">Yedekten yükle</button>
       <input type="file" id="importFile" accept=".json,application/json" class="hidden">
@@ -225,6 +227,10 @@
             <button type="button" data-type="vcard">Rehber QR</button>
           </div>
           <div class="qr-frame"><img id="qrImage" alt="QR kod"></div>
+          <div class="publish-state" id="publishState">
+            <span id="publishText"></span>
+            <button type="button" class="btn sm" id="publishBtn"><svg class="i" aria-hidden="true"><use href="#i-globe"/></svg>Şimdi yayınla</button>
+          </div>
           <p class="qr-note" id="qrNote"></p>
           <div class="grid-2 tight">
             <button type="button" class="btn sm" id="pngBtn"><svg class="i" aria-hidden="true"><use href="#i-dl"/></svg>PNG</button>
@@ -242,6 +248,29 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- ============ Yayın bağlantısı ============ -->
+<div class="overlay center hidden" id="publishDialog">
+  <form class="dialog wide" id="publishForm" autocomplete="off">
+    <h3>Yayın bağlantısı</h3>
+    <p class="muted small">Kartvizitlerin güncel hâlinin QR'dan açılabilmesi için panel, kartvizit dosyalarını GitHub deposuna şifreli olarak yazar. Bunun için yalnızca bu depoya yazabilen bir erişim anahtarı gerekir.</p>
+    <ol class="steps">
+      <li>GitHub → <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</b></li>
+      <li><b>Expiration:</b> 1 yıl · <b>Repository access:</b> Only select repositories → <b id="publishRepo"></b></li>
+      <li><b>Permissions → Repository permissions → Contents:</b> Read and write</li>
+      <li><b>Generate token</b> ile oluşan anahtarı aşağıya yapıştırın.</li>
+    </ol>
+    <div class="err" id="publishErr" role="alert"></div>
+    <input class="input" type="password" id="publishToken" placeholder="github_pat_…" autocomplete="off" spellcheck="false">
+    <p class="muted small" id="publishCurrent"></p>
+    <div class="dialog-actions">
+      <button type="button" class="btn danger hidden" id="publishRemove">Bağlantıyı kaldır</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn" data-close="publishDialog">Vazgeç</button>
+      <button type="submit" class="btn primary" id="publishSave">Kaydet ve doğrula</button>
+    </div>
+  </form>
 </div>
 
 <!-- ============ Doğrulama penceresi (yedek işlemleri) ============ -->

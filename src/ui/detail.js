@@ -3,15 +3,18 @@
  */
 import { CARD_PAGE_PATH } from '../config.js';
 import { encodeCard } from '../core/card-codec.js';
+import { cardFragment } from '../core/card-file.js';
+import { CardStore } from '../core/store.js';
 import { QR_TYPES, qrContent, toDataUrl, toPngBlob, toSvg } from '../core/qr.js';
 import { slugify } from '../core/vcard.js';
 import { $, $$, downloadBlob, escapeHtml, initials, openOverlay } from './dom.js';
+import { isConnected } from './publish.js';
 
 const NOTES = {
-  [QR_TYPES.card]: '<b>Kartvizit QR:</b> Okutulunca Canlar Group kartvizit sayfası açılır (Ara, E-posta, Rehbere ekle). '
-    + 'Bilgiler QR\'ın içindedir ve hiçbir sunucuya gönderilmez. Bilgiler değişirse QR\'ı yeniden indirin.',
+  [QR_TYPES.card]: '<b>Kartvizit QR:</b> Bu QR kişiye özeldir ve değişmez. Bilgileri güncellediğinizde aynı QR '
+    + 'yeni bilgileri gösterir; yeniden basmanız gerekmez. Bilgiler kişiye özel anahtarla şifreli yayınlanır.',
   [QR_TYPES.vcard]: '<b>Rehber QR:</b> Okutulunca telefon doğrudan "Kişiyi kaydet" ekranını açar. '
-    + 'İnternet bağlantısı gerektirmez. Bilgiler değişirse QR\'ı yeniden indirin.',
+    + 'İnternet gerektirmez; ancak bilgiler QR\'ın içine yazıldığı için değişiklikte bu QR yeniden indirilmelidir.',
 };
 
 let current = null;
@@ -22,11 +25,27 @@ const colorsOf = (card) => ({ fg: card.fg_color, bg: card.bg_color });
 const contentOf = (card) => qrContent(card, type, context.cardPageUrl);
 const fileName = (card, extension) => `qr-${slugify(card.full_name)}${type === QR_TYPES.vcard ? '-rehber' : ''}.${extension}`;
 
+function renderPublishState() {
+  const box = $('#publishState');
+  const pending = CardStore.isPending(current);
+  box.classList.toggle('hidden', type !== QR_TYPES.card);
+  box.classList.toggle('ok', !pending);
+  box.classList.toggle('warn', pending);
+  $('#publishText').textContent = !pending
+    ? `Yayında · ${new Date(current.published_at).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })}`
+    : isConnected() ? 'Son değişiklik yayınlanmadı' : 'Yayınlanmadı · önce yayın bağlantısını kurun';
+  $('#publishBtn').classList.toggle('hidden', !pending || !isConnected());
+}
+
 function renderQr() {
   $('#qrImage').src = toDataUrl(contentOf(current), colorsOf(current));
   $('#qrNote').innerHTML = NOTES[type];
   $('#openCard').classList.toggle('hidden', type !== QR_TYPES.card);
-  $('#openCard').href = `${CARD_PAGE_PATH}#${encodeCard(current)}`;
+  // Yayınlanmışsa gerçek bağlantı, değilse yerel önizleme açılır.
+  $('#openCard').href = current.published_at
+    ? `${CARD_PAGE_PATH}#${cardFragment(current)}`
+    : `${CARD_PAGE_PATH}?preview#${encodeCard(current)}`;
+  renderPublishState();
 }
 
 function renderInfo(card) {
@@ -46,7 +65,7 @@ function renderInfo(card) {
 }
 
 /**
- * @param {{ cardPageUrl: string, onEdit: (card) => void, onDelete: (card) => Promise<void> }} options
+ * @param {{ cardPageUrl: string, onEdit: (card) => void, onDelete: (card) => Promise<void>, onPublish: (card) => Promise<void> }} options
  */
 export function initDetail(options) {
   context = options;
@@ -65,6 +84,11 @@ export function initDetail(options) {
   });
   $('#editBtn').addEventListener('click', () => context.onEdit(current));
   $('#deleteBtn').addEventListener('click', () => context.onDelete(current));
+  $('#publishBtn').addEventListener('click', async () => {
+    const button = $('#publishBtn');
+    button.disabled = true;
+    try { await context.onPublish(current); } finally { button.disabled = false; }
+  });
 }
 
 export function openDetail(card) {

@@ -70,3 +70,46 @@ test('yedek kendi tuzuyla şifrelenir ve başka cihazda açılır', async () => 
   assert.equal(await target.importBackup(backup, 'yedek-bilgisi'), 1);
   assert.equal(await target.importBackup(backup, 'yedek-bilgisi'), 0, 'aynı kayıt tekrar eklenmemeli');
 });
+
+test('her kayda kalıcı QR kimliği verilir; güncellemede değişmez; yayın durumu izlenir', async () => {
+  const storage = new MemoryStorage();
+  const store = new CardStore(await deriveKey('x', params), storage);
+  await store.load();
+  const card = await store.create(CARD);
+  assert.match(card.qr_id, /^[A-Za-z0-9_-]{16}$/);
+  assert.equal(CardStore.isPending(card), true);
+  const published = await store.markPublished(card.id);
+  assert.equal(CardStore.isPending(published), false);
+  await new Promise((resolve) => { setTimeout(resolve, 5); });
+  const updated = await store.update(card.id, { title_tr: 'Müdür' });
+  assert.equal(updated.qr_id, card.qr_id);
+  assert.equal(updated.qr_key, card.qr_key);
+  assert.equal(CardStore.isPending(updated), true, 'değişiklik sonrası yeniden yayın gerekmeli');
+});
+
+test('kimliksiz eski kayıtlara kimlik verilir; ayarlar şifreli saklanır', async () => {
+  const storage = new MemoryStorage();
+  const key = await deriveKey('x', params);
+  const { seal } = await import('../src/core/crypto.js');
+  storage.setItem(STORAGE_KEYS.vault, await seal(key, JSON.stringify([{ id: 1, ...CARD, created_at: '2026-01-01', updated_at: '2026-01-01' }])));
+  const store = new CardStore(key, storage);
+  const [card] = await store.load();
+  assert.match(card.qr_key, /^[A-Za-z0-9_-]{43}$/);
+  await store.setSetting('github_token', 'github_pat_GIZLI');
+  assert.ok(!storage.dump().includes('GIZLI'));
+  const again = new CardStore(key, storage);
+  const [same] = await again.load();
+  assert.equal(same.qr_id, card.qr_id, 'kimlik kalıcı olmalı');
+  assert.equal(again.getSetting('github_token'), 'github_pat_GIZLI');
+});
+
+test('yedekten geri yüklemede QR kimlikleri korunur', async () => {
+  const source = new CardStore(await deriveKey('a', params), new MemoryStorage());
+  await source.load();
+  const card = await source.create(CARD);
+  const target = new CardStore(await deriveKey('b', params), new MemoryStorage());
+  await target.load();
+  await target.importBackup(await source.exportBackup('y'), 'y');
+  assert.equal(target.list()[0].qr_id, card.qr_id);
+  assert.equal(target.list()[0].qr_key, card.qr_key);
+});

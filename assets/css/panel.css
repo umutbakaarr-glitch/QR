@@ -63,6 +63,9 @@
 .infobox-title { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; color: #fff; font-weight: 600; }
 .infobox-title svg.i { width: 16px; height: 16px; color: #4cc98a; }
 .infobox p { margin: 0; color: #a5a5a1; line-height: 1.4; }
+.publish-line { display: flex; align-items: center; gap: 8px; margin-top: 10px; color: #d6d6d3; font-weight: 600; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #f5a524; box-shadow: 0 0 0 3px rgba(245, 165, 36, .2); flex: none; }
+.dot.ok { background: #4cc98a; box-shadow: 0 0 0 3px rgba(76, 201, 138, .2); }
 .user-row { display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; }
 .user-avatar { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--red); color: #fff; font-size: 12px; font-weight: 700; }
 .user-name { flex: 1; font-size: 13px; line-height: 1.2; }
@@ -127,6 +130,9 @@
 .dialog h3 { margin: 0 0 6px; }
 .dialog .input { margin: 4px 0 16px; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.dialog.wide { max-width: 560px; }
+.dialog-actions .spacer { flex: 1; }
+.steps { margin: 0 0 14px; padding-left: 20px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
 
 /* Düzenleyici */
 .editor { display: grid; grid-template-columns: 1fr 340px; gap: 28px; align-items: start; }
@@ -152,6 +158,12 @@
 .segmented button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(29, 29, 27, .1); }
 .qr-frame { padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
 .qr-frame img { display: block; width: 100%; aspect-ratio: 1; }
+.publish-state { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); font-size: 12.5px; font-weight: 600; text-align: left; }
+.publish-state.ok { color: #1f9d63; }
+.publish-state.warn { color: #b7791f; }
+:root[data-theme="dark"] .publish-state.ok { color: #4cc98a; }
+:root[data-theme="dark"] .publish-state.warn { color: #f5a524; }
+.pending { display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 99px; background: rgba(245, 165, 36, .16); color: #b7791f; font-size: 11px; font-weight: 600; vertical-align: 1px; }
 .qr-note { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); color: var(--muted); font-size: 12.5px; line-height: 1.45; text-align: left; }
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
 .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; margin: 0 0 14px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); }

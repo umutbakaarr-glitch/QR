@@ -24,6 +24,18 @@ export const CARD_FIELDS = Object.freeze([
   'department',
 ]);
 
+/**
+ * Kartvizit dosyalarının yayınlandığı GitHub deposu.
+ * Her kartvizit `dir/<kimlik>.json` olarak, kişiye özel anahtarla şifreli yazılır.
+ */
+export const PUBLISH = Object.freeze({
+  owner: 'umutbakaarr-glitch',
+  repo: 'QR',
+  branch: 'main',
+  dir: 'kartvizit/k',
+  api: 'https://api.github.com',
+});
+
 /** QR bağlantısındaki veri biçiminin sürümü. */
 export const CODEC_VERSION = 1;
 

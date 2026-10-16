@@ -2,6 +2,7 @@
  * Kartvizit listesi ve özet kutuları.
  */
 import { QR_TYPES, qrContent, toDataUrl } from '../core/qr.js';
+import { CardStore } from '../core/store.js';
 import { $, escapeHtml, formatNumber, initials } from './dom.js';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -34,7 +35,7 @@ function rowHtml(card, cardPageUrl) {
     <tr data-id="${card.id}">
       <td><div class="person">
         <div class="avatar">${escapeHtml(initials(card.full_name))}</div>
-        <div class="person-text"><div class="person-name">${escapeHtml(card.full_name)}</div><div class="person-title">${escapeHtml(card.title_tr)}</div></div>
+        <div class="person-text"><div class="person-name">${escapeHtml(card.full_name)}${CardStore.isPending(card) ? '<span class="pending">Yayınlanmadı</span>' : ''}</div><div class="person-title">${escapeHtml(card.title_tr)}</div></div>
       </div></td>
       <td class="col-dept"><div class="cell-text">${escapeHtml(card.department)}</div></td>
       <td class="col-mail"><div class="cell-text">${escapeHtml(card.email)}</div></td>

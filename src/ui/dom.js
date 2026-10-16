@@ -27,7 +27,7 @@ export function toast(message) {
   element.innerHTML = icon('check');
   element.append(document.createTextNode(message));
   document.body.append(element);
-  setTimeout(() => element.remove(), 2400);
+  setTimeout(() => element.remove(), Math.max(2400, message.length * 60));
 }
 
 /** Bir Blob'u dosya olarak indirir. */

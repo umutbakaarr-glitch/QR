@@ -1,10 +1,13 @@
 /**
- * Kartvizit sayfası: bağlantının "#" sonrasındaki bilgileri çözer ve gösterir.
- * Sayfa çerez kullanmaz, hiçbir sunucuya istek göndermez; içerik yalnızca DOM API'leriyle
- * (innerHTML kullanılmadan) oluşturulur.
+ * Kartvizit sayfası.
+ *  - Kalıcı QR (#<id>.<key>): şifreli kartvizit dosyasını aynı siteden indirir, anahtarla çözer.
+ *    Anahtar bağlantının # sonrasındadır ve sunucuya hiç gönderilmez.
+ *  - Eski QR'lar ve panel önizlemesi (#<veri>): bilgiler doğrudan bağlantıdan çözülür.
+ * Sayfa çerez kullanmaz; içerik yalnızca DOM API'leriyle (innerHTML kullanılmadan) oluşturulur.
  */
 import { ORG } from './config.js';
 import { decodeCard } from './core/card-codec.js';
+import { decryptCardFile, parseFragment } from './core/card-file.js';
 import { formatPhone, telHref } from './core/phone.js';
 import { buildVCard, slugify } from './core/vcard.js';
 
@@ -108,11 +111,32 @@ function renderCard(card, root) {
   );
 }
 
-function renderMessage(root) {
-  document.title = `${ORG.name} · Kartvizit bulunamadı`;
+function renderMessage(root, title = 'Kartvizit bulunamadı', text = 'Bu QR koda ait kartvizit bilgisi okunamadı.') {
+  document.title = `${ORG.name} · ${title}`;
   root.replaceChildren(el('section', { className: 'message' },
-    el('h1', { textContent: 'Kartvizit bulunamadı' }),
-    el('p', { textContent: 'Bu QR koda ait kartvizit bilgisi okunamadı.' })));
+    el('h1', { textContent: title }),
+    el('p', { textContent: text })));
+}
+
+/** Kalıcı QR: güncel şifreli dosyayı indirir (önbelleği atlayarak) ve çözer. */
+async function loadPublishedCard({ id, key }, root) {
+  renderMessage(root, 'Yükleniyor…', 'Kartvizit bilgileri getiriliyor.');
+  let response;
+  try {
+    response = await fetch(`k/${id}.json?t=${Date.now()}`, { cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
+  } catch {
+    renderMessage(root, 'Bağlantı kurulamadı', 'İnternet bağlantınızı kontrol edip sayfayı yenileyin.');
+    return;
+  }
+  if (!response.ok) {
+    renderMessage(root, 'Kartvizit bulunamadı', 'Bu kartvizit yayında değil veya kaldırılmış.');
+    return;
+  }
+  try {
+    renderCard(await decryptCardFile(await response.text(), key), root);
+  } catch {
+    renderMessage(root);
+  }
 }
 
 function sameOriginParent() {
@@ -123,6 +147,11 @@ function render() {
   const root = document.getElementById('root');
   const preview = new URLSearchParams(window.location.search).has('preview');
   document.body.classList.toggle('preview', preview);
+  const published = parseFragment(window.location.hash);
+  if (published) {
+    loadPublishedCard(published, root);
+    return;
+  }
   const card = decodeCard(window.location.hash);
   if (card && (card.full_name || preview)) renderCard(card, root);
   else renderMessage(root);

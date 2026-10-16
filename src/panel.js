@@ -10,6 +10,7 @@ import { initEditor, openEditor } from './ui/editor.js';
 import { renderList } from './ui/list.js';
 import { showLogin } from './ui/login.js';
 import { initTheme } from './ui/theme.js';
+import { initPublishing, isConnected, loadPublisher, publishCard, unpublishCard } from './ui/publish.js';
 
 const cardPageUrl = new URL(CARD_PAGE_PATH, document.baseURI).href;
 
@@ -31,6 +32,7 @@ function refresh() {
 async function startSession(key) {
   store = new CardStore(key);
   await store.load();
+  loadPublisher(store);
   $('#login').classList.add('hidden');
   $('#app').classList.remove('hidden');
   refresh();
@@ -51,13 +53,29 @@ function init() {
   bindOverlayClosing();
   initTheme();
 
+  /** Kaydı yayınlar; bağlantı yoksa veya hata olursa kayıt yerelde kalır ve "yayınlanmadı" görünür. */
+  const tryPublish = async (card, successMessage) => {
+    if (!isConnected()) {
+      toast(`${successMessage}. Yayınlamak için yayın bağlantısını kurun.`);
+      return card;
+    }
+    try {
+      const published = await publishCard(card);
+      toast(`${successMessage} ve yayınlandı`);
+      return published;
+    } catch (err) {
+      toast(`${successMessage}, ancak yayınlanamadı: ${err.message}`);
+      return card;
+    }
+  };
+
   initEditor({
     save: async (id, data) => {
       const saved = id ? await store.update(id, data) : await store.create(data);
+      const result = await tryPublish(saved, id ? 'Değişiklikler kaydedildi' : 'Kartvizit oluşturuldu');
       refresh();
-      toast(id ? 'Değişiklikler kaydedildi' : 'Kartvizit oluşturuldu');
-      openDetail(saved);
-      return saved;
+      openDetail(store.get(result.id));
+      return result;
     },
     suggestCompanyPhone: () => store.list().find((card) => card.company_phone)?.company_phone ?? '',
   });
@@ -65,8 +83,25 @@ function init() {
   initDetail({
     cardPageUrl,
     onEdit: (card) => { closeOverlay('detail'); openEditor(card); },
+    onPublish: async (card) => {
+      await tryPublish(card, 'Kartvizit');
+      refresh();
+      openDetail(store.get(card.id));
+    },
     onDelete: async (card) => {
-      if (!window.confirm(`"${card.full_name}" kartviziti silinsin mi? Bu işlem geri alınamaz.`)) return;
+      if (card.published_at && !isConnected()) {
+        if (!window.confirm('Yayın bağlantısı kurulu olmadığı için bu kartvizit internetten kaldırılamayacak; QR okutulmaya devam edecek. Yine de yalnızca bu cihazdan silinsin mi?')) return;
+      } else if (!window.confirm(`"${card.full_name}" kartviziti silinsin mi? QR okutulduğunda artık "bulunamadı" görünecek. Bu işlem geri alınamaz.`)) {
+        return;
+      }
+      if (card.published_at && isConnected()) {
+        try {
+          await unpublishCard(card);
+        } catch (err) {
+          toast(`Silinemedi: ${err.message}`);
+          return;
+        }
+      }
       await store.remove(card.id);
       closeOverlay('detail');
       refresh();
@@ -75,6 +110,7 @@ function init() {
   });
 
   initBackup({ getStore: () => store, onImported: refresh });
+  initPublishing({ getStore: () => store, isPending: CardStore.isPending, onChanged: refresh });
 
   $('#search').addEventListener('input', refresh);
   $$('[data-action="new"]').forEach((button) => button.addEventListener('click', () => openEditor()));

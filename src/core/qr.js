@@ -2,25 +2,26 @@
  * QR kod üretimi. assets/vendor/qrcode-generator.js betiğinin sağladığı global
  * `qrcode` fonksiyonunu kullanır (MIT lisanslı, harici bağlantı gerektirmez).
  */
-import { encodeCard } from './card-codec.js';
+import { cardFragment } from './card-file.js';
 import { buildVCard } from './vcard.js';
 
 const QUIET_ZONE = 2; // modül cinsinden kenar boşluğu
 
 export const QR_TYPES = Object.freeze({
-  card: 'card', // kartvizit sayfasını açan bağlantı
+  card: 'card', // kartvizit sayfasını açan kalıcı bağlantı (bilgiler güncellenebilir)
   vcard: 'vcard', // doğrudan rehbere kaydedilen kişi bilgisi
 });
 
 /** QR'a yazılacak metni üretir. */
 export function qrContent(card, type, cardPageUrl) {
-  return type === QR_TYPES.vcard ? buildVCard(card) : `${cardPageUrl}#${encodeCard(card)}`;
+  return type === QR_TYPES.vcard ? buildVCard(card) : `${cardPageUrl}#${cardFragment(card)}`;
 }
 
 function buildMatrix(text) {
   const generator = globalThis.qrcode;
   generator.stringToBytes = generator.stringToBytesFuncs['UTF-8'];
-  const model = generator(0, 'L');
+  // Kısa içerikte (kalıcı kartvizit bağlantısı) daha yüksek hata düzeltme: hasarlı baskıda da okunur.
+  const model = generator(0, text.length <= 300 ? 'M' : 'L');
   model.addData(text, 'Byte');
   model.make();
   const count = model.getModuleCount();

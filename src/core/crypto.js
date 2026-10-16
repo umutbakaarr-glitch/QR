@@ -50,3 +50,15 @@ export async function open(key, packedText) {
   const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: packed.slice(0, 12) }, key, packed.slice(12));
   return decoder.decode(plain);
 }
+
+/** base64url (URL'de güvenle taşınabilen base64). */
+export const toBase64Url = (bytes) => toBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+export function fromBase64Url(text) {
+  let base64 = text.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) base64 += '=';
+  return fromBase64(base64);
+}
+
+/** Ham baytlardan AES-GCM anahtarı oluşturur (kişiye özel kartvizit anahtarı için). */
+export const importAesKey = (bytes) => crypto.subtle.importKey('raw', bytes, 'AES-GCM', false, ['encrypt', 'decrypt']);

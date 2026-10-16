@@ -6,6 +6,8 @@ Personel için dijital kartvizit ve QR kod yönetimi. Panelde oluşturulan her k
 
 - **Kişisel veri sunucuya gitmez.** Kartvizit bilgileri bağlantının `#` sonrasında taşınır; tarayıcılar bu
   kısmı sunucuya göndermez. Barındırma sunucusunun kayıtlarında kişisel veri bulunmaz.
+- **Kalıcı QR, şifreli kartvizit dosyaları.** Her kişinin QR'ı değişmez; bilgiler `kartvizit/k/<kimlik>.json` dosyasına
+  kişiye özel 256 bit anahtarla (AES-GCM) şifreli yazılır. Anahtar yalnızca QR bağlantısının `#` sonrasında bulunur.
 - **Harici bağlantı yok.** Yazı tipi, analiz, çerez veya üçüncü taraf betiği kullanılmaz.
 - **Şifreli depolama.** Panel verileri AES-GCM 256 ile şifrelenir; anahtar PBKDF2-SHA256 (600.000 tur) ile
   türetilir ve yalnızca bellekte tutulur. Sayfa yenilenince, kapatılınca veya 15 dakika işlem yapılmayınca
