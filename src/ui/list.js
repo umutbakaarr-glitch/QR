@@ -1,9 +1,9 @@
 /**
  * Kartvizit listesi ve özet kutuları.
  */
-import { QR_TYPES, qrContent, toDataUrl } from '../core/qr.js?v=11';
-import { CardStore } from '../core/store.js?v=11';
-import { $, escapeHtml, formatNumber, initials } from './dom.js?v=11';
+import { QR_TYPES, qrContent, toDataUrl } from '../core/qr.js?v=12';
+import { CardStore } from '../core/store.js?v=12';
+import { $, escapeHtml, formatNumber, initials } from './dom.js?v=12';
 
 const DAY = 24 * 60 * 60 * 1000;
 

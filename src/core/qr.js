@@ -2,7 +2,7 @@
  * QR kod üretimi. assets/vendor/qrcode-generator.js betiğinin sağladığı global
  * `qrcode` fonksiyonunu kullanır (MIT lisanslı, harici bağlantı gerektirmez).
  */
-import { cardFragment } from './card-file.js?v=11';
+import { cardFragment } from './card-file.js?v=12';
 
 const QUIET_ZONE = 2; // modül cinsinden kenar boşluğu
 

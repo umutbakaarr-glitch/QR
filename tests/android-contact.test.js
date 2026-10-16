@@ -11,7 +11,7 @@ const extras = (intent) => Object.fromEntries(intent.replace(/^intent:#Intent;/,
   .map((part) => part.split('=')).map(([k, v]) => [k, decodeURIComponent(v)]));
 
 test('rehber uygulamasının "Yeni kişi" ekranını açan intent üretilir', () => {
-  const intent = buildContactIntent(CARD, 'https://ornek/kartvizit/?rehber&vcf=1#a.b');
+  const intent = buildContactIntent(CARD, 'https://ornek/kartvizit/?rehber&dokun=1#a.b');
   assert.match(intent, /^intent:#Intent;action=android\.intent\.action\.INSERT;type=vnd\.android\.cursor\.dir\/raw_contact;/);
   assert.match(intent, /;end$/);
   const e = extras(intent);
@@ -23,7 +23,7 @@ test('rehber uygulamasının "Yeni kişi" ekranını açan intent üretilir', ()
   assert.equal(e['S.company'], 'Canlar Group');
   assert.equal(e['S.job_title'], 'Satın Alma Müdürü');
   assert.match(e['S.notes'], /Satın Alma; İthalat/);
-  assert.equal(e['S.browser_fallback_url'], 'https://ornek/kartvizit/?rehber&vcf=1#a.b');
+  assert.equal(e['S.browser_fallback_url'], 'https://ornek/kartvizit/?rehber&dokun=1#a.b');
 });
 
 test('ayırıcı karakterler değerleri bozamaz; cep yoksa şirket telefonu birincil olur', () => {

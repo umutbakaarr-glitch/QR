@@ -1,14 +1,14 @@
 /**
  * Kartvizit detayı: QR önizleme, indirme ve kayıt işlemleri.
  */
-import { CARD_PAGE_PATH } from '../config.js?v=11';
-import { encodeCard } from '../core/card-codec.js?v=11';
-import { cardFragment } from '../core/card-file.js?v=11';
-import { CardStore } from '../core/store.js?v=11';
-import { QR_TYPES, qrContent, toDataUrl, toPngBlob, toSvg } from '../core/qr.js?v=11';
-import { slugify } from '../core/vcard.js?v=11';
-import { $, $$, downloadBlob, escapeHtml, initials, openOverlay } from './dom.js?v=11';
-import { isConnected } from './publish.js?v=11';
+import { CARD_PAGE_PATH } from '../config.js?v=12';
+import { encodeCard } from '../core/card-codec.js?v=12';
+import { cardFragment } from '../core/card-file.js?v=12';
+import { CardStore } from '../core/store.js?v=12';
+import { QR_TYPES, qrContent, toDataUrl, toPngBlob, toSvg } from '../core/qr.js?v=12';
+import { slugify } from '../core/vcard.js?v=12';
+import { $, $$, downloadBlob, escapeHtml, initials, openOverlay } from './dom.js?v=12';
+import { isConnected } from './publish.js?v=12';
 
 const NOTES = {
   [QR_TYPES.card]: '<b>Kartvizit QR:</b> Bu QR kişiye özeldir ve değişmez. Bilgileri güncellediğinizde aynı QR '

@@ -1,8 +1,8 @@
 /**
  * Açık / koyu tema düğmeleri. İlk uygulama src/theme-init.js içinde yapılır.
  */
-import { THEME_STORAGE_KEY } from '../config.js?v=11';
-import { $$ } from './dom.js?v=11';
+import { THEME_STORAGE_KEY } from '../config.js?v=12';
+import { $$ } from './dom.js?v=12';
 
 const root = document.documentElement;
 const media = window.matchMedia('(prefers-color-scheme: dark)');

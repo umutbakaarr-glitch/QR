@@ -1,7 +1,7 @@
 /**
  * Şifreli yedek alma ve yedekten geri yükleme.
  */
-import { $, closeOverlay, downloadBlob, openOverlay, toast } from './dom.js?v=11';
+import { $, closeOverlay, downloadBlob, openOverlay, toast } from './dom.js?v=12';
 
 /**
  * Giriş bilgisini yeniden soran pencere.

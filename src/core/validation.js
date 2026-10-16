@@ -1,8 +1,8 @@
 /**
  * Kartvizit verisinin temizlenmesi ve doğrulanması.
  */
-import { CARD_FIELDS } from '../config.js?v=11';
-import { isValidPhone } from './phone.js?v=11';
+import { CARD_FIELDS } from '../config.js?v=12';
+import { isValidPhone } from './phone.js?v=12';
 
 const MAX_LENGTH = Object.freeze({
   full_name: 100,

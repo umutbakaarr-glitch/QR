@@ -6,12 +6,12 @@
  *  - Eski QR'lar ve panel önizlemesi (#<veri>): bilgiler doğrudan bağlantıdan çözülür.
  * Sayfa çerez kullanmaz; içerik yalnızca DOM API'leriyle (innerHTML kullanılmadan) oluşturulur.
  */
-import { ORG } from './config.js?v=11';
-import { decodeCard } from './core/card-codec.js?v=11';
-import { decryptCardFile, parseFragment } from './core/card-file.js?v=11';
-import { formatPhone, telHref } from './core/phone.js?v=11';
-import { buildContactIntent } from './core/android-contact.js?v=11';
-import { buildVCard, slugify } from './core/vcard.js?v=11';
+import { ORG } from './config.js?v=12';
+import { decodeCard } from './core/card-codec.js?v=12';
+import { decryptCardFile, parseFragment } from './core/card-file.js?v=12';
+import { formatPhone, telHref } from './core/phone.js?v=12';
+import { buildContactIntent } from './core/android-contact.js?v=12';
+import { buildVCard, slugify } from './core/vcard.js?v=12';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const ICONS = {
@@ -54,25 +54,18 @@ const isIOS = () => /iP(hone|ad|od)/.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isAndroid = () => /Android/i.test(navigator.userAgent);
 
-/** Rehber uygulaması açılamazsa dönülecek adres: aynı sayfa, vCard dosyası yöntemiyle. */
-function vcfFallbackUrl() {
+/**
+ * Rehber uygulaması kendiliğinden açılamazsa dönülecek adres: aynı sayfa, yalnızca
+ * "Rehbere kaydet" düğmesiyle (dosya indirme yok). Anahtar yine # sonrasında kalır.
+ */
+function tapFallbackUrl() {
   const url = new URL(window.location.href);
-  url.searchParams.set('vcf', '1');
+  url.searchParams.set('dokun', '1');
   return url.href;
 }
 
-/**
- * Kişiyi telefon rehberine kaydettirir.
- * Android: rehber uygulamasının "Yeni kişi" ekranı, alanlar dolu olarak doğrudan açılır (dosya inmez).
- * iPhone/iPad: vCard'a yönlenmek Safari'de doğrudan "Yeni Kişi" ekranını açar.
- * Diğerleri (ve Android'de rehber uygulaması açılamazsa): .vcf dosyası indirilir.
- */
-function saveContact(card) {
-  const vcfOnly = new URLSearchParams(window.location.search).has('vcf');
-  if (isAndroid() && !vcfOnly) {
-    window.location.href = buildContactIntent(card, vcfFallbackUrl());
-    return;
-  }
+/** Kişiyi .vcf dosyası olarak verir (iPhone'da Safari doğrudan "Yeni Kişi" ekranını açar). */
+function openVCard(card) {
   const blob = new Blob([buildVCard(card)], { type: 'text/vcard;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   if (isIOS()) {
@@ -84,6 +77,19 @@ function saveContact(card) {
     link.remove();
   }
   setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+/**
+ * Kişiyi telefon rehberine kaydettirir.
+ * Android: rehber uygulamasının "Yeni kişi" ekranı, alanlar dolu olarak doğrudan açılır (dosya inmez).
+ * iPhone/iPad ve diğerleri: vCard.
+ */
+function saveContact(card) {
+  if (isAndroid()) {
+    window.location.href = buildContactIntent(card, tapFallbackUrl());
+    return;
+  }
+  openVCard(card);
 }
 
 function contactRow(iconName, label, value, href, extra) {
@@ -143,26 +149,36 @@ let autoSaved = false;
 
 /**
  * Rehber QR: güncel bilgiler gelir gelmez telefonun "Kişiyi kaydet" ekranı kendiliğinden açılır.
- * Telefon otomatik açmayı engellerse ekranda tek bir "Rehbere kaydet" düğmesi kalır.
+ * Tarayıcı otomatik açmayı engellerse (bazı Samsung tarayıcıları) sayfa "?dokun" ile geri döner ve
+ * tek dokunuşla aynı ekranı açan "Rehbere kaydet" düğmesi gösterilir. Hiçbir durumda dosya inmez.
  */
 function renderSaveContact(card, root) {
   const name = card.full_name || 'Adı Soyadı';
+  const manual = new URLSearchParams(window.location.search).has('dokun');
   document.title = `${name} · Rehbere kaydet · ${ORG.name}`;
   const save = el('button', { className: 'save-big', type: 'button' }, icon('save'), el('span', { textContent: 'Rehbere kaydet' }));
   save.addEventListener('click', () => saveContact(card));
+  let vcfLink = null;
+  if (manual) {
+    vcfLink = el('button', { className: 'link-btn', type: 'button', textContent: 'Rehber açılmıyorsa kişi kartını indir' });
+    vcfLink.addEventListener('click', () => openVCard(card));
+  }
   root.replaceChildren(
     el('section', { className: 'profile compact' },
+      el('div', { className: 'profile-avatar', textContent: initials(name) }),
       el('h1', { textContent: name }),
-      el('p', { className: 'save-hint', textContent: 'Kişi kaydı açılıyor… Açılmazsa aşağıdaki düğmeye dokunun.' }),
-      save),
+      card.title_tr ? el('p', { className: 'title-tr', textContent: card.title_tr }) : null,
+      el('p', { className: 'save-hint', textContent: manual ? 'Kişiyi telefonunuza kaydetmek için dokunun.' : 'Kişi kaydı açılıyor…' }),
+      save,
+      vcfLink),
     el('footer', { className: 'foot' },
       `© ${ORG.name} · `,
       el('a', { href: ORG.site, target: '_blank', rel: 'noopener noreferrer', textContent: ORG.siteLabel }),
       el('div', { className: 'privacy', textContent: 'Bu sayfa çerez kullanmaz; bilgiler hiçbir sunucuya gönderilmez.' })),
   );
-  if (!autoSaved) {
+  if (!manual && !autoSaved) {
     autoSaved = true;
-    setTimeout(() => saveContact(card), 150);
+    saveContact(card);
   }
 }
 

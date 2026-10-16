@@ -44,7 +44,7 @@ body.preview a, body.preview button { pointer-events: none; }
 .action svg { width: 22px; height: 22px; }
 .action.primary { background: var(--red); color: #fff; box-shadow: 0 10px 20px -10px rgba(227, 6, 19, .8); }
 
-.profile.compact { padding-top: 26px; }
+.profile.compact { padding-bottom: 24px; }
 .profile.compact .save-hint { margin-top: 8px; }
 .save-hint { margin: 18px 0 14px; color: var(--muted); font-size: 14px; }
 .save-big {

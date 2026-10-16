@@ -1,8 +1,8 @@
 /**
  * vCard 3.0 üretimi ("Rehbere ekle" dosyası ve Rehber QR içeriği).
  */
-import { ORG } from '../config.js?v=11';
-import { toE164 } from './phone.js?v=11';
+import { ORG } from '../config.js?v=12';
+import { toE164 } from './phone.js?v=12';
 
 const escapeValue = (value) => String(value ?? '')
   .replace(/\\/g, '\\\\')
