@@ -1,0 +1,65 @@
+/* QR okutulunca açılan kartvizit sayfası. */
+
+body { min-height: 100vh; font-size: 15px; -webkit-tap-highlight-color: transparent; }
+body.preview a, body.preview button { pointer-events: none; }
+
+.hero {
+  position: relative; overflow: hidden; height: 250px;
+  background: linear-gradient(150deg, #f01b28 0%, var(--red) 45%, var(--red-dark) 100%);
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(115deg, rgba(255, 255, 255, .06) 0 2px, transparent 2px 22px);
+}
+.hero::after {
+  content: ""; position: absolute; top: -80px; right: -80px; width: 280px; height: 280px;
+  border: 38px solid rgba(255, 255, 255, .08); border-radius: 50%;
+}
+.hero-logo { position: relative; z-index: 1; display: block; height: 46px; margin: 36px auto 0; }
+
+.wrap { position: relative; z-index: 2; max-width: 440px; margin: -110px auto 0; padding: 0 16px 36px; }
+
+.profile {
+  position: relative; padding: 64px 22px 22px; border-radius: 22px; background: var(--surface); text-align: center;
+  box-shadow: 0 22px 50px -22px rgba(29, 29, 27, .45), 0 2px 6px rgba(29, 29, 27, .06);
+  animation: rise .5s cubic-bezier(.2, .8, .2, 1) both;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+.profile-avatar {
+  position: absolute; top: -52px; left: 50%; transform: translateX(-50%);
+  display: grid; place-items: center; width: 104px; height: 104px; border: 5px solid var(--surface); border-radius: 50%;
+  background: var(--ink); color: #fff; font-size: 36px; font-weight: 800; box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .5);
+}
+.profile h1 { margin: 0 0 6px; font-size: 24px; line-height: 1.2; font-weight: 800; }
+.title-tr { margin: 0; color: var(--red); font-weight: 700; }
+.title-en { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.dept { display: inline-block; max-width: 100%; margin-top: 14px; padding: 6px 12px; border-radius: 99px; background: var(--bg); font-size: 13px; font-weight: 600; }
+
+.actions { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; gap: 10px; margin: 22px 0 4px; }
+.action {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border: 0; border-radius: 14px;
+  background: var(--red-soft); color: var(--red); font-size: 13px; font-weight: 700; cursor: pointer; transition: transform .15s;
+}
+.action:active { transform: scale(.96); }
+.action svg { width: 22px; height: 22px; }
+.action.primary { background: var(--red); color: #fff; box-shadow: 0 10px 20px -10px rgba(227, 6, 19, .8); }
+
+.contacts { margin-top: 16px; overflow: hidden; border-radius: 20px; background: var(--surface); box-shadow: 0 2px 6px rgba(29, 29, 27, .05); }
+.contact { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--line); color: inherit; }
+.contact:first-child { border-top: 0; }
+a.contact:active { background: var(--red-soft); }
+.contact-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--red-soft); color: var(--red); flex: none; }
+.contact-icon svg { width: 19px; height: 19px; }
+.contact-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.contact-label { color: var(--muted); font-size: 12px; font-weight: 500; }
+.contact-value { font-weight: 600; word-break: break-word; }
+.contact-extra { color: var(--red); font-size: 13px; }
+.chevron { color: #b0b0b0; font-size: 22px; line-height: 1; }
+
+.foot { margin-top: 22px; color: var(--muted); font-size: 12px; text-align: center; }
+.foot a { color: var(--muted); text-decoration: underline; }
+.privacy { margin-top: 6px; font-size: 11px; }
+
+.message { max-width: 360px; margin: 50px auto 0; padding: 28px; border-radius: 20px; background: var(--surface); text-align: center; box-shadow: 0 22px 50px -22px rgba(29, 29, 27, .45); }
+.message h1 { margin: 0 0 6px; font-size: 20px; }
+.message p { margin: 0; color: var(--muted); }
