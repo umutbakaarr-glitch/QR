@@ -7,7 +7,7 @@
  *
  * Biçim: base64url( JSON.stringify([CODEC_VERSION, ...CARD_FIELDS değerleri]) )
  */
-import { CARD_FIELDS, CODEC_VERSION } from '../config.js';
+import { CARD_FIELDS, CODEC_VERSION } from '../config.js?v=9';
 
 const MAX_ENCODED_LENGTH = 2000;
 

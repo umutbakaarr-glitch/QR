@@ -7,8 +7,8 @@
  * Bilgiler değiştiğinde aynı anahtarla yeniden şifrelenip aynı dosyaya yazılır; QR değişmez.
  * Anahtar yalnızca QR'da (bağlantının # sonrasında) bulunur ve sunucuya hiç gönderilmez.
  */
-import { CARD_FIELDS, PUBLISH } from '../config.js';
-import { fromBase64Url, importAesKey, open, randomBytes, seal, toBase64Url } from './crypto.js';
+import { CARD_FIELDS, PUBLISH } from '../config.js?v=9';
+import { fromBase64Url, importAesKey, open, randomBytes, seal, toBase64Url } from './crypto.js?v=9';
 
 const FILE_VERSION = 1;
 const ID_PATTERN = /^[A-Za-z0-9_-]{16}$/;

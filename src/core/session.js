@@ -2,8 +2,8 @@
  * Oturum açma: girilen değerden anahtar türetir ve doğrulama bloğunu çözerek kontrol eder.
  * Anahtar yalnızca bellekte tutulur; sayfa kapanınca veya yenilenince oturum sona erer.
  */
-import { ACCESS } from '../config.js';
-import { deriveKey, open } from './crypto.js';
+import { ACCESS } from '../config.js?v=9';
+import { deriveKey, open } from './crypto.js?v=9';
 
 const CHECK_TEXT = 'canlar-qr-ok';
 

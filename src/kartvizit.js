@@ -6,11 +6,11 @@
  *  - Eski QR'lar ve panel önizlemesi (#<veri>): bilgiler doğrudan bağlantıdan çözülür.
  * Sayfa çerez kullanmaz; içerik yalnızca DOM API'leriyle (innerHTML kullanılmadan) oluşturulur.
  */
-import { ORG } from './config.js';
-import { decodeCard } from './core/card-codec.js';
-import { decryptCardFile, parseFragment } from './core/card-file.js';
-import { formatPhone, telHref } from './core/phone.js';
-import { buildVCard, slugify } from './core/vcard.js';
+import { ORG } from './config.js?v=9';
+import { decodeCard } from './core/card-codec.js?v=9';
+import { decryptCardFile, parseFragment } from './core/card-file.js?v=9';
+import { formatPhone, telHref } from './core/phone.js?v=9';
+import { buildVCard, slugify } from './core/vcard.js?v=9';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const ICONS = {

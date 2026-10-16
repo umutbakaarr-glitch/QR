@@ -1,5 +1,10 @@
 /**
  * Uygulama genelindeki sabit ayarlar.
+ *
+ * Önbellek notu: GitHub Pages dosyaları tarayıcıda ~10 dakika önbelleğe alınır. Tarayıcının eski
+ * kodu kullanmaması için tüm import yolları ve HTML'deki dosya bağlantıları "?v=<sürüm>" taşır.
+ * Kod değiştiğinde bu sürüm numarası TÜM dosyalarda birlikte artırılmalıdır (aynı modül farklı
+ * sürüm numarasıyla iki kez yüklenmemelidir).
  * Kurum bilgisi, alan listesi ve depolama anahtarları yalnızca burada tanımlanır.
  */
 
