@@ -3,7 +3,7 @@
  * Yalnızca ilgili depoda "Contents: Read and write" yetkisi olan, ince ayarlı (fine-grained)
  * bir erişim anahtarı kullanılmalıdır. Anahtar tarayıcıda yalnızca şifreli kasada saklanır.
  */
-import { PUBLISH } from '../config.js?v=10';
+import { PUBLISH } from '../config.js?v=11';
 
 const encodeBase64Utf8 = (text) => {
   let binary = '';

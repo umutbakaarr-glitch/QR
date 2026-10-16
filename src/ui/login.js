@@ -1,8 +1,8 @@
 /**
  * Giriş ekranı.
  */
-import { unlock } from '../core/session.js?v=10';
-import { $ } from './dom.js?v=10';
+import { unlock } from '../core/session.js?v=11';
+import { $ } from './dom.js?v=11';
 
 /**
  * Giriş ekranını gösterir; doğru bilgi girildiğinde anahtarla birlikte onUnlock çağrılır.

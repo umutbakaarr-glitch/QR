@@ -3,10 +3,10 @@
  * Kayıtlar ve ayarlar tarayıcının yerel deposunda (localStorage) tek bir şifreli blok olarak saklanır.
  * Düz metin hiçbir zaman diske yazılmaz.
  */
-import { STORAGE_KEYS } from '../config.js?v=10';
-import { createCardIdentity, hasIdentity } from './card-file.js?v=10';
-import { deriveKey, open, randomBytes, seal, toBase64 } from './crypto.js?v=10';
-import { validateCard } from './validation.js?v=10';
+import { STORAGE_KEYS } from '../config.js?v=11';
+import { createCardIdentity, hasIdentity } from './card-file.js?v=11';
+import { deriveKey, open, randomBytes, seal, toBase64 } from './crypto.js?v=11';
+import { validateCard } from './validation.js?v=11';
 
 const VAULT_VERSION = 2;
 const BACKUP_APP = 'canlar-qr';

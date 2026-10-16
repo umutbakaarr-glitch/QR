@@ -1,16 +1,16 @@
 /**
  * Yönetim paneli giriş noktası: modülleri bağlar, oturumu ve kilitlemeyi yönetir.
  */
-import { CARD_PAGE_PATH, IDLE_LOCK_MINUTES } from './config.js?v=10';
-import { CardStore } from './core/store.js?v=10';
-import { initBackup } from './ui/backup.js?v=10';
-import { initDetail, openDetail } from './ui/detail.js?v=10';
-import { $, $$, bindOverlayClosing, closeOverlay, toast } from './ui/dom.js?v=10';
-import { initEditor, openEditor } from './ui/editor.js?v=10';
-import { renderList } from './ui/list.js?v=10';
-import { showLogin } from './ui/login.js?v=10';
-import { initTheme } from './ui/theme.js?v=10';
-import { initPublishing, isConnected, loadPublisher, publishCard, unpublishCard } from './ui/publish.js?v=10';
+import { CARD_PAGE_PATH, IDLE_LOCK_MINUTES } from './config.js?v=11';
+import { CardStore } from './core/store.js?v=11';
+import { initBackup } from './ui/backup.js?v=11';
+import { initDetail, openDetail } from './ui/detail.js?v=11';
+import { $, $$, bindOverlayClosing, closeOverlay, toast } from './ui/dom.js?v=11';
+import { initEditor, openEditor } from './ui/editor.js?v=11';
+import { renderList } from './ui/list.js?v=11';
+import { showLogin } from './ui/login.js?v=11';
+import { initTheme } from './ui/theme.js?v=11';
+import { initPublishing, isConnected, loadPublisher, publishCard, unpublishCard } from './ui/publish.js?v=11';
 
 const cardPageUrl = new URL(CARD_PAGE_PATH, document.baseURI).href;
 

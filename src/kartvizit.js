@@ -6,11 +6,12 @@
  *  - Eski QR'lar ve panel önizlemesi (#<veri>): bilgiler doğrudan bağlantıdan çözülür.
  * Sayfa çerez kullanmaz; içerik yalnızca DOM API'leriyle (innerHTML kullanılmadan) oluşturulur.
  */
-import { ORG } from './config.js?v=10';
-import { decodeCard } from './core/card-codec.js?v=10';
-import { decryptCardFile, parseFragment } from './core/card-file.js?v=10';
-import { formatPhone, telHref } from './core/phone.js?v=10';
-import { buildVCard, slugify } from './core/vcard.js?v=10';
+import { ORG } from './config.js?v=11';
+import { decodeCard } from './core/card-codec.js?v=11';
+import { decryptCardFile, parseFragment } from './core/card-file.js?v=11';
+import { formatPhone, telHref } from './core/phone.js?v=11';
+import { buildContactIntent } from './core/android-contact.js?v=11';
+import { buildVCard, slugify } from './core/vcard.js?v=11';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const ICONS = {
@@ -51,13 +52,27 @@ const initials = (name) => {
 
 const isIOS = () => /iP(hone|ad|od)/.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndroid = () => /Android/i.test(navigator.userAgent);
+
+/** Rehber uygulaması açılamazsa dönülecek adres: aynı sayfa, vCard dosyası yöntemiyle. */
+function vcfFallbackUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('vcf', '1');
+  return url.href;
+}
 
 /**
  * Kişiyi telefon rehberine kaydettirir.
+ * Android: rehber uygulamasının "Yeni kişi" ekranı, alanlar dolu olarak doğrudan açılır (dosya inmez).
  * iPhone/iPad: vCard'a yönlenmek Safari'de doğrudan "Yeni Kişi" ekranını açar.
- * Android ve diğerleri: .vcf dosyası indirilir; telefon rehber uygulamasıyla açar.
+ * Diğerleri (ve Android'de rehber uygulaması açılamazsa): .vcf dosyası indirilir.
  */
 function saveContact(card) {
+  const vcfOnly = new URLSearchParams(window.location.search).has('vcf');
+  if (isAndroid() && !vcfOnly) {
+    window.location.href = buildContactIntent(card, vcfFallbackUrl());
+    return;
+  }
   const blob = new Blob([buildVCard(card)], { type: 'text/vcard;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   if (isIOS()) {
