@@ -1,6 +1,7 @@
 /* Yönetim paneli düzeni ve bileşenleri. */
 
-.logo { display: block; width: auto; }
+/* Dikey (flex-column) kapsayıcılarda logonun genişliğe yayılıp bozulmasını engeller. */
+.logo { display: block; width: auto; max-width: 100%; align-self: flex-start; object-fit: contain; }
 
 /* ---------- Giriş ---------- */
 .login { min-height: 100vh; display: grid; grid-template-columns: 1.05fr 1fr; }
