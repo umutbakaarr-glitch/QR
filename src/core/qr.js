@@ -3,18 +3,21 @@
  * `qrcode` fonksiyonunu kullanır (MIT lisanslı, harici bağlantı gerektirmez).
  */
 import { cardFragment } from './card-file.js';
-import { buildVCard } from './vcard.js';
 
 const QUIET_ZONE = 2; // modül cinsinden kenar boşluğu
 
 export const QR_TYPES = Object.freeze({
   card: 'card', // kartvizit sayfasını açan kalıcı bağlantı (bilgiler güncellenebilir)
-  vcard: 'vcard', // doğrudan rehbere kaydedilen kişi bilgisi
+  vcard: 'vcard', // açılınca doğrudan "Kişiyi kaydet" ekranını gösteren kalıcı bağlantı
 });
 
-/** QR'a yazılacak metni üretir. */
+/**
+ * QR'a yazılacak metni üretir. Her iki tür de kişiye özel kalıcı bağlantıdır;
+ * bilgiler güncellendiğinde aynı QR yeni bilgileri gösterir.
+ */
 export function qrContent(card, type, cardPageUrl) {
-  return type === QR_TYPES.vcard ? buildVCard(card) : `${cardPageUrl}#${cardFragment(card)}`;
+  const mode = type === QR_TYPES.vcard ? '?rehber' : '';
+  return `${cardPageUrl}${mode}#${cardFragment(card)}`;
 }
 
 function buildMatrix(text) {

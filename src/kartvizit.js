@@ -1,6 +1,7 @@
 /**
  * Kartvizit sayfası.
  *  - Kalıcı QR (#<id>.<key>): şifreli kartvizit dosyasını aynı siteden indirir, anahtarla çözer.
+ *    "?rehber" ile açılırsa (Rehber QR) önce "Rehbere kaydet" ekranı gösterilir.
  *    Anahtar bağlantının # sonrasındadır ve sunucuya hiç gönderilmez.
  *  - Eski QR'lar ve panel önizlemesi (#<veri>): bilgiler doğrudan bağlantıdan çözülür.
  * Sayfa çerez kullanmaz; içerik yalnızca DOM API'leriyle (innerHTML kullanılmadan) oluşturulur.
@@ -111,6 +112,30 @@ function renderCard(card, root) {
   );
 }
 
+/** Rehber QR: kişiyi rehbere kaydetmeye odaklı ekran. */
+function renderSaveContact(card, root) {
+  const name = card.full_name || 'Adı Soyadı';
+  document.title = `${name} · Rehbere kaydet · ${ORG.name}`;
+  const save = el('button', { className: 'save-big', type: 'button' }, icon('save'), el('span', { textContent: 'Rehbere kaydet' }));
+  save.addEventListener('click', () => saveContact(card));
+  const details = el('button', { className: 'link-btn', type: 'button', textContent: 'Kartviziti görüntüle' });
+  details.addEventListener('click', () => renderCard(card, root));
+  root.replaceChildren(
+    el('section', { className: 'profile' },
+      el('div', { className: 'profile-avatar', textContent: initials(name) }),
+      el('h1', { textContent: name }),
+      card.title_tr ? el('p', { className: 'title-tr', textContent: card.title_tr }) : null,
+      card.title_en ? el('p', { className: 'title-en', lang: 'en', textContent: card.title_en }) : null,
+      el('p', { className: 'save-hint', textContent: 'İletişim bilgilerini telefon rehberinize eklemek için dokunun.' }),
+      save,
+      details),
+    el('footer', { className: 'foot' },
+      `© ${ORG.name} · `,
+      el('a', { href: ORG.site, target: '_blank', rel: 'noopener noreferrer', textContent: ORG.siteLabel }),
+      el('div', { className: 'privacy', textContent: 'Bu sayfa çerez kullanmaz; bilgiler hiçbir sunucuya gönderilmez.' })),
+  );
+}
+
 function renderMessage(root, title = 'Kartvizit bulunamadı', text = 'Bu QR koda ait kartvizit bilgisi okunamadı.') {
   document.title = `${ORG.name} · ${title}`;
   root.replaceChildren(el('section', { className: 'message' },
@@ -119,7 +144,7 @@ function renderMessage(root, title = 'Kartvizit bulunamadı', text = 'Bu QR koda
 }
 
 /** Kalıcı QR: güncel şifreli dosyayı indirir (önbelleği atlayarak) ve çözer. */
-async function loadPublishedCard({ id, key }, root) {
+async function loadPublishedCard({ id, key }, root, contactMode) {
   renderMessage(root, 'Yükleniyor…', 'Kartvizit bilgileri getiriliyor.');
   let response;
   try {
@@ -133,7 +158,9 @@ async function loadPublishedCard({ id, key }, root) {
     return;
   }
   try {
-    renderCard(await decryptCardFile(await response.text(), key), root);
+    const card = await decryptCardFile(await response.text(), key);
+    if (contactMode) renderSaveContact(card, root);
+    else renderCard(card, root);
   } catch {
     renderMessage(root);
   }
@@ -149,7 +176,7 @@ function render() {
   document.body.classList.toggle('preview', preview);
   const published = parseFragment(window.location.hash);
   if (published) {
-    loadPublishedCard(published, root);
+    loadPublishedCard(published, root, new URLSearchParams(window.location.search).has('rehber'));
     return;
   }
   const card = decodeCard(window.location.hash);

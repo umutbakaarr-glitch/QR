@@ -13,8 +13,8 @@ import { isConnected } from './publish.js';
 const NOTES = {
   [QR_TYPES.card]: '<b>Kartvizit QR:</b> Bu QR kişiye özeldir ve değişmez. Bilgileri güncellediğinizde aynı QR '
     + 'yeni bilgileri gösterir; yeniden basmanız gerekmez. Bilgiler kişiye özel anahtarla şifreli yayınlanır.',
-  [QR_TYPES.vcard]: '<b>Rehber QR:</b> Okutulunca telefon doğrudan "Kişiyi kaydet" ekranını açar. '
-    + 'İnternet gerektirmez; ancak bilgiler QR\'ın içine yazıldığı için değişiklikte bu QR yeniden indirilmelidir.',
+  [QR_TYPES.vcard]: '<b>Rehber QR:</b> Okutulunca doğrudan "Rehbere kaydet" ekranı açılır. Bu QR da kişiye özeldir ve '
+    + 'değişmez; bilgileri güncellediğinizde aynı QR yeni bilgileri kaydettirir.',
 };
 
 let current = null;
@@ -28,7 +28,7 @@ const fileName = (card, extension) => `qr-${slugify(card.full_name)}${type === Q
 function renderPublishState() {
   const box = $('#publishState');
   const pending = CardStore.isPending(current);
-  box.classList.toggle('hidden', type !== QR_TYPES.card);
+  box.classList.remove('hidden');
   box.classList.toggle('ok', !pending);
   box.classList.toggle('warn', pending);
   $('#publishText').textContent = !pending
@@ -40,11 +40,12 @@ function renderPublishState() {
 function renderQr() {
   $('#qrImage').src = toDataUrl(contentOf(current), colorsOf(current));
   $('#qrNote').innerHTML = NOTES[type];
-  $('#openCard').classList.toggle('hidden', type !== QR_TYPES.card);
-  // Yayınlanmışsa gerçek bağlantı, değilse yerel önizleme açılır.
+  // Yayınlanmışsa gerçek bağlantı (QR'ın açtığı sayfa), değilse yerel önizleme açılır.
+  const mode = type === QR_TYPES.vcard ? '?rehber' : '';
   $('#openCard').href = current.published_at
-    ? `${CARD_PAGE_PATH}#${cardFragment(current)}`
+    ? `${CARD_PAGE_PATH}${mode}#${cardFragment(current)}`
     : `${CARD_PAGE_PATH}?preview#${encodeCard(current)}`;
+  $('#openCard span').textContent = type === QR_TYPES.vcard ? 'Rehber sayfasını aç' : 'Kartvizit sayfasını aç';
   renderPublishState();
 }
 
