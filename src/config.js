@@ -40,6 +40,9 @@ export const STORAGE_KEYS = Object.freeze({
   archived: 'canlarqr.vault.archived',
 });
 
+/** Tema tercihinin saklandığı anahtar (src/theme-init.js ile aynı olmalı). */
+export const THEME_STORAGE_KEY = 'canlarqr.theme';
+
 /** Oturum doğrulama parametreleri (PBKDF2-SHA256 tuzu, tur sayısı ve doğrulama bloğu). */
 export const ACCESS = Object.freeze({
   salt: 'iXM3C5hq4izQFvq/4sXXLA==',

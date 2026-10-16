@@ -9,6 +9,7 @@ import { $, $$, bindOverlayClosing, closeOverlay, toast } from './ui/dom.js';
 import { initEditor, openEditor } from './ui/editor.js';
 import { renderList } from './ui/list.js';
 import { showLogin } from './ui/login.js';
+import { initTheme } from './ui/theme.js';
 
 const cardPageUrl = new URL(CARD_PAGE_PATH, document.baseURI).href;
 
@@ -48,6 +49,7 @@ function init() {
   }
 
   bindOverlayClosing();
+  initTheme();
 
   initEditor({
     save: async (id, data) => {
